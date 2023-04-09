@@ -1,39 +1,48 @@
 import dotenv from 'dotenv';
 import {createClient} from './classes/Client.mjs';
+import Contract from './classes/Contract.mjs';
+import Marketplace from './classes/Marketplace.mjs';
+import { lastValueFrom, mergeMap, switchMap } from 'rxjs';
+import { add, startOfDay, endOfDay } from 'date-fns';
+import { createEndDate, createStartDate } from './utils/date.mjs';
 
 dotenv.config();
 
-
 const master = await createClient(process.env.PRIVATE_KEY);
 
-const nftContract = await master.contracts.getContract('RentableNft');
+const nftContract = await master.resolveContract('RentableNft', Contract);
 const tx = await nftContract.mintNFT('ipfs://bafybeiffapvkruv2vwtomswqzxiaxdgm2dflet2cxmh6t4ixrgaezumbw4')
 const tokenId = Number(tx.events.Transfer.returnValues.tokenId);
 
-const contractMarketplace = await master.contracts.getContract('Marketplace');
+const contractMarketplace = await master.resolveContract('Marketplace', Marketplace);
 // let txn = await contractMarketplace.proof(nftContract.data.methods.approve(contractMarketplace.data._address, tokenId));
 // console.log(txn);
 
-const listingFee = await contractMarketplace.data.methods.getListingFee().call();
+const now = Date.now() + 5 * 1000;
+const period = { from: createStartDate(now), to: createEndDate(now, {days: 7}) };
 
-const buffer = 3000;
-const start = Math.ceil(Date.now() / 1000) + buffer;
-const end = start + 5000;
-
-const tx2 = await contractMarketplace.data.methods.listNFT(
-  nftContract.data._address,
+const result = await lastValueFrom(contractMarketplace.listNFT(
+  nftContract,
   tokenId, 
-  '1000000000000000000',
-  start, 
-  end
-);
+  master.kit.web3.utils.toWei('1', 'wei'),
+  period
+));
 
-const gas = await tx2.estimateGas({from: master.kit.defaultAccount})
-const options = {
-  from    : master.kit.defaultAccount,
-  value   : listingFee,         
-  data    : tx2.encodeABI(),
-  gas     : gas,
-  gasPrice: '200000000000'
-};     
-tx2.send(options);  
+console.log('RESULT', result);
+
+// contractMarketplace.rentNFT(nftContract, 60 * 60 * 24).subscribe((e) => {
+//   console.log(e);
+// });
+
+// contractMarketplace.unlistAllNFTsByContract(nftContract).subscribe((e) => {
+//   console.log(e);
+// });
+
+
+// contractMarketplace.getListings().pipe(
+//   mergeMap((e) => {
+//     return contractMarketplace.unlistNFT(nftContract, e)
+//   })
+// ).subscribe((e) => {
+//     console.log(e);
+// });

@@ -19,9 +19,11 @@
     "@celo/utils": "^1.5.0",
     "@infura/sdk": "^2.2.0",
     "@openzeppelin/contracts": "^4.8.0",
+    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
     "@openzeppelin/test-helpers": "^0.5.16",
+    "date-fns": "^2.29.3",
     "dotenv": "^10.0.0",
-    "ofetch": "^1.0.1",
+    "rxjs": "^7.8.0",
     "web3": "^1.3.0"
   }
 }

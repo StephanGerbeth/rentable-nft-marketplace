@@ -1,8 +1,11 @@
 export default class Contract {
-    constructor(web3, kit, data) {
-        this.web3 = web3;
+    constructor(kit, data) {
         this.kit = kit;
         this.data = data;
+    }
+
+    get address() {
+        return this.data._address;
     }
 
     async mintNFT(tokenURI) {                
@@ -16,9 +19,6 @@ export default class Contract {
             gasPrice: 200000000000
         };        
         return tx.send(options);
-        
-        // const signed  = await this.web3.eth.accounts.signTransaction(options, privateKey);
-        // return this.web3.eth.sendSignedTransaction(signed.rawTransaction); 
     }
 
     async setUser(tokenId, client, expiration) {        
@@ -30,7 +30,7 @@ export default class Contract {
             gas     : await tx.estimateGas({from: this.kit.defaultAccount}),
             gasPrice: 200000000000
         };
-        const signed  = await this.web3.eth.accounts.signTransaction(options, process.env.PRIVATE_KEY);
-        return this.web3.eth.sendSignedTransaction(signed.rawTransaction); 
+        const signed  = await this.kit.web3.eth.accounts.signTransaction(options, process.env.PRIVATE_KEY);
+        return this.kit.web3.eth.sendSignedTransaction(signed.rawTransaction); 
     }
 }

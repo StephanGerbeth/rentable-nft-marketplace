@@ -1,12 +1,10 @@
 import Web3 from 'web3';
 import ContractKit from '@celo/contractkit';
-
-import ContractsManager from './ContractsManager.mjs';
+import { loadContract } from '../utils/json.mjs';
 
 class Client {
-    constructor({web3, kit}) {
+    constructor({kit}) {
         this.kit = kit;                   
-        this.contracts = new ContractsManager(web3, kit);
     }
 
     get address () {
@@ -16,17 +14,25 @@ class Client {
     async getBalance() {
         return this.kit.getTotalBalance(this.kit.defaultAccount)
     }
+
+    async resolveContract(name, Clazz) {
+        const contractConfig = await loadContract(name);   
+        console.log(await this.kit.web3.eth.net.getId());          
+        const deployedNetwork = contractConfig.networks[await this.kit.web3.eth.net.getId()];        
+        let contract = new this.kit.web3.eth.Contract(contractConfig.abi, deployedNetwork && deployedNetwork.address);
+        return new Clazz(this.kit, contract);
+    }
 };
 
-export const createClient = async (key) => {    
-    return new Client(await setupAccount(key));
+export const createClient = async (privateKey) => {    
+    return new Client(await setupAccount(privateKey));
 }
 
-const setupAccount = async (key) => {    
-    const web3 = new Web3('https://alfajores-forno.celo-testnet.org')
+const setupAccount = async (privateKey) => {    
+    const web3 = new Web3('https://alfajores-forno.celo-testnet.org');
+    const account = web3.eth.accounts.privateKeyToAccount(privateKey);      
     const kit = ContractKit.newKitFromWeb3(web3)
-    kit.connection.addAccount(key);
-    const accounts = await kit.web3.eth.getAccounts()   
-    kit.defaultAccount = accounts[0];    
-    return { web3, kit };
+    kit.connection.addAccount(account.privateKey);    
+    kit.defaultAccount = account.address;;            
+    return { kit };
 }
