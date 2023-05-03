@@ -1,22 +1,21 @@
 import dotenv from 'dotenv';
-import {createClient} from './classes/Client.mjs';
-import Contract from './classes/Contract.mjs';
-import Marketplace from './classes/Marketplace.mjs';
-import { lastValueFrom, mergeMap, switchMap } from 'rxjs';
-import { add, startOfDay, endOfDay } from 'date-fns';
-import { createEndDate, createStartDate } from './utils/date.mjs';
+import { lastValueFrom } from 'rxjs';
+
+import {createClient} from '../../classes/Client.mjs';
+import Contract from '../../classes/Contract.mjs';
+import Marketplace from '../../classes/Marketplace.mjs';
+import { createEndDate, createStartDate } from '../../utils/date.mjs';
 
 dotenv.config();
 
 const master = await createClient(process.env.MASTER_PRIVATE_KEY);
+console.log(master.address);
 
 const nftContract = await master.resolveContract('RentableNft', Contract);
 const tx = await nftContract.mintNFT('ipfs://bafybeiffapvkruv2vwtomswqzxiaxdgm2dflet2cxmh6t4ixrgaezumbw4')
 const tokenId = Number(tx.events.Transfer.returnValues.tokenId);
 
 const contractMarketplace = await master.resolveContract('Marketplace', Marketplace);
-// let txn = await contractMarketplace.proof(nftContract.data.methods.approve(contractMarketplace.data._address, tokenId));
-// console.log(txn);
 
 const balanceBefore = (await master.getBalance()).CELO.toString();
 
@@ -36,19 +35,6 @@ const balanceAfter = (await master.getBalance()).CELO.toString();
 console.log({balanceBefore, balanceAfter});
 console.log('diff', balanceBefore - balanceAfter);
 
-// contractMarketplace.rentNFT(nftContract, 60 * 60 * 24).subscribe((e) => {
-//   console.log(e);
-// });
-
-// contractMarketplace.unlistAllNFTsByContract(nftContract).subscribe((e) => {
-//   console.log(e);
-// });
-
-
-// contractMarketplace.getListings().pipe(
-//   mergeMap((e) => {
-//     return contractMarketplace.unlistNFT(nftContract, e)
-//   })
-// ).subscribe((e) => {
+// contractMarketplace.getListings().subscribe((e) => {
 //     console.log(e);
 // });

@@ -7,11 +7,11 @@ require('dotenv').config()
 const HelloWorld = require('./build/contracts/HelloWorld.json')
 
 async function awaitWrapper(){    
-    kit.connection.addAccount(process.env.PRIVATE_KEY) // this account must have a CELO balance to pay transaction fees
+    kit.connection.addAccount(process.env.MASTER_PRIVATE_KEY) // this account must have a CELO balance to pay transaction fees
 
     // This account must have a CELO balance to pay tx fees 
     // get some testnet funds at https://celo.org/build/faucet
-    const address = privateKeyToAddress(process.env.PRIVATE_KEY)
+    const address = privateKeyToAddress(process.env.MASTER_PRIVATE_KEY)
     console.log(address)
 
     let tx = await kit.connection.sendTransaction({
