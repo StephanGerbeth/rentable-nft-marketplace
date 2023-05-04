@@ -23,8 +23,8 @@ async function relay(forwarder, request, signature, whitelist) {
   if (!valid) throw new Error(`Invalid request`);
   
   // Send meta-tx through relayer to the forwarder contract
-  (parseInt(request.gas) + 50000).toString();
-  return await forwarder.execute(request, signature, { gasPrice: '25000000000' });
+  const gasLimit = (parseInt(request.gas) + 50000).toString();
+  return await forwarder.execute(request, signature, { gasLimit });
 }
 
 async function handler(event) {

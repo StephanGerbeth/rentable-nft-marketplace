@@ -16,7 +16,7 @@ async function relay(forwarder, request, signature, whitelist) {
   
   // Send meta-tx through relayer to the forwarder contract
   const gasLimit = (parseInt(request.gas) + 50000).toString();
-  return await forwarder.execute(request, signature, { gasPrice: '25000000000' });
+  return await forwarder.execute(request, signature, { gasLimit });
 }
 
 async function handler(event) {
