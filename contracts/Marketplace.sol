@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/MinimalForwarder.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/interfaces/IERC165.sol";
@@ -9,7 +11,7 @@ import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./IERC4907.sol";
 
-contract Marketplace is ReentrancyGuard {
+contract Marketplace is ReentrancyGuard, ERC2771Context {
   using Counters for Counters.Counter;
   using EnumerableSet for EnumerableSet.AddressSet;
   using EnumerableSet for EnumerableSet.UintSet;
@@ -59,8 +61,8 @@ contract Marketplace is ReentrancyGuard {
       uint256 refund
   );
 
-  constructor() {
-      _marketOwner = msg.sender;
+  constructor(MinimalForwarder forwarder) ERC2771Context(address(forwarder)) {
+      _marketOwner = _msgSender();
   }
 
   // function to list NFT for rental
@@ -72,7 +74,7 @@ contract Marketplace is ReentrancyGuard {
       uint256 endDateUNIX
   ) public payable nonReentrant {
       require(isRentableNFT(nftContract), "Contract is not an ERC4907");
-      require(IERC721(nftContract).ownerOf(tokenId) == msg.sender, "Not owner of nft");
+      require(IERC721(nftContract).ownerOf(tokenId) == _msgSender(), "Not owner of nft");
       require(msg.value == _listingFee, string.concat("Not enough ether for listing fee ", Strings.toString(msg.value), Strings.toString(_listingFee)));
       require(pricePerDay > 0, "Rental price should be greater than 0");
       require(startDateUNIX >= block.timestamp, "Start date cannot be in the past");
@@ -81,7 +83,7 @@ contract Marketplace is ReentrancyGuard {
       
       payable(_marketOwner).transfer(_listingFee);
       _listingMap[nftContract][tokenId] = Listing(
-          msg.sender,
+          _msgSender(),
           address(0),
           nftContract,
           tokenId,
@@ -136,13 +138,13 @@ contract Marketplace is ReentrancyGuard {
         require(msg.value >= rentalFee, "Not enough ether to cover rental period");
         payable(listing.owner).transfer(rentalFee);
         // Update listing
-        IERC4907(nftContract).setUser(tokenId, msg.sender, expires);
-        listing.user = msg.sender;
+        IERC4907(nftContract).setUser(tokenId, _msgSender(), expires);
+        listing.user = _msgSender();
         listing.expires = expires;
 
         emit NFTRented(
             IERC721(nftContract).ownerOf(tokenId),
-            msg.sender,
+            _msgSender(),
             nftContract,
             tokenId,
             listing.startDateUNIX,
@@ -156,7 +158,7 @@ contract Marketplace is ReentrancyGuard {
     function unlistNFT(address nftContract, uint256 tokenId) public payable nonReentrant {
         Listing storage listing = _listingMap[nftContract][tokenId];
         require(listing.owner != address(0), "This NFT is not listed");
-        require(listing.owner == msg.sender || _marketOwner == msg.sender , "Not approved to unlist NFT");
+        require(listing.owner == _msgSender() || _marketOwner == _msgSender() , "Not approved to unlist NFT");
         // fee to be returned to user if unlisted before rental period is up
         // nothing to refund if no renter
         uint256 refund = 0;
@@ -175,7 +177,7 @@ contract Marketplace is ReentrancyGuard {
         _nftsListed.decrement();
 
         emit NFTUnlisted(
-            msg.sender,
+            _msgSender(),
             nftContract,
             tokenId,
             refund

@@ -1,3 +1,4 @@
+import {signMetaTxRequest} from '../utils/transaction/meta.mjs';
 export default class Contract {
     constructor(kit, data) {
         this.kit = kit;
@@ -12,8 +13,8 @@ export default class Contract {
         return this.kit.web3.eth.getGasPrice()
     }
 
-    async mintNFT(tokenURI) {                
-        const tx = await this.data.methods.mint(tokenURI);
+    async mintNFT(tokenURI, forwarder) {                
+        const tx = await this.data.methods.mint(tokenURI);        
         const gasPrice = await this.getGasPrice();
         const gas = await tx.estimateGas({from: this.kit.defaultAccount})
         const options = {
@@ -22,22 +23,13 @@ export default class Contract {
             gas,
             gasPrice
         };        
-        return tx.send(options);
+        if(forwarder) {                       
+            return signMetaTxRequest(this.kit.web3.currentProvider, forwarder, {
+                ...options,
+                to: this.kit.defaultAccount                
+            });
+        } else {
+            return tx.send(options);
+        }
     }
-
-    // async loyaltyToken() {
-    //     return this.data.methods.loyaltyToken().call();               
-    // }
-
-    // async registerVendor() {
-    //    const tx = this.data.methods.registerVendor();
-    //    const gas = await tx.estimateGas({from: this.kit.defaultAccount})
-    //     const options = {
-    //         from    : this.kit.defaultAccount,                     
-    //         data    : tx.encodeABI(),
-    //         gas     : gas,
-    //         gasPrice: 200000000000
-    //     };        
-    //     return tx.send(options);
-    // }
 }

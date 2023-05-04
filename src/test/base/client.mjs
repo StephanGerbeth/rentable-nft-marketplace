@@ -12,13 +12,13 @@ console.log(client.address);
 const nftContract = await client.resolveContract('RentableNft', Contract);
 const contractMarketplace = await client.resolveContract('Marketplace', Marketplace);
 
-const balanceBefore = (await client.getBalance()).CELO.toString();
+const balanceBefore = await client.getBalance();
 contractMarketplace.rentNFT(nftContract, 60 * 60 * 24).subscribe((e) => {
     console.log(e.events);
 });
 
 setTimeout(async () => {
-    const balanceAfter = (await client.getBalance()).CELO.toString();
+    const balanceAfter = await client.getBalance();
     console.log({balanceBefore, balanceAfter});
     console.log('diff', balanceBefore - balanceAfter);
 }, 10000)

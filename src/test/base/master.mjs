@@ -16,8 +16,7 @@ const tx = await nftContract.mintNFT('ipfs://bafybeiffapvkruv2vwtomswqzxiaxdgm2d
 const tokenId = Number(tx.events.Transfer.returnValues.tokenId);
 
 const contractMarketplace = await master.resolveContract('Marketplace', Marketplace);
-
-const balanceBefore = (await master.getBalance()).CELO.toString();
+const balanceBefore = await master.getBalance();
 
 const now = Date.now() + 5 * 1000;
 const period = { from: createStartDate(now), to: createEndDate(now, {days: 7}) };
@@ -31,7 +30,7 @@ const result = await lastValueFrom(contractMarketplace.listNFT(
 
 console.log('RESULT', result);
 
-const balanceAfter = (await master.getBalance()).CELO.toString();
+const balanceAfter = await master.getBalance();
 console.log({balanceBefore, balanceAfter});
 console.log('diff', balanceBefore - balanceAfter);
 
