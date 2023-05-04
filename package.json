@@ -11,7 +11,7 @@
     "compile": "npx truffle compile",
     "migrate": "npx truffle migrate --network alfajores",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c --bundleConfigAsCjs && node ./scripts/defender/upload.js"
+    "build": "rollup -c --bundleConfigAsCjs && node ./scripts/defender/upload.mjs"
   },
   "author": "",
   "license": "ISC",

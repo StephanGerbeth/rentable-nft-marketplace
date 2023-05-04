@@ -1,5 +1,5 @@
-const { AutotaskClient } = require('defender-autotask-client');
-const dotenv = require('dotenv');
+import { AutotaskClient } from 'defender-autotask-client';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -13,14 +13,13 @@ async function main() {
     console.log(`Code updated`);
 }
 
-(async () => {
-    try {
-        await main()
-        process.exit(0)
-    }
-    catch(error) { 
-        console.error(error); 
-        process.exit(1); 
-    };
-})();
+try {
+    await main()
+    process.exit(0)
+}
+catch(error) { 
+    console.error(error); 
+    process.exit(1); 
+};
+
 
