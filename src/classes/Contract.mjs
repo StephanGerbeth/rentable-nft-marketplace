@@ -16,7 +16,7 @@ export default class Contract {
     async mintNFT(tokenURI, forwarder) {                
         const tx = await this.data.methods.mint(tokenURI);        
         const gasPrice = await this.getGasPrice();
-        const gas = await tx.estimateGas({from: this.kit.defaultAccount})
+        const gas = await tx.estimateGas({from: this.kit.defaultAccount})        
         const options = {
             from: this.kit.defaultAccount,                     
             data: tx.encodeABI(),
@@ -27,7 +27,7 @@ export default class Contract {
             return signMetaTxRequest(this.kit.web3.currentProvider, forwarder, {
                 ...options,
                 to: this.kit.defaultAccount                
-            });
+            }, this.kit);
         } else {
             return tx.send(options);
         }

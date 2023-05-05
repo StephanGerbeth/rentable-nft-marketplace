@@ -2962,6 +2962,16 @@
     "elliptic" "^6.4.0"
     "xhr-request-promise" "^0.1.2"
 
+"eth-sig-util@^3.0.1":
+  "integrity" "sha512-0Us50HiGGvZgjtWTyAI/+qTzYPMLy5Q451D0Xy68bxq1QMWdoOddDwGvsqcFT27uohKgalM9z/yxplyt+mY2iQ=="
+  "resolved" "https://registry.npmjs.org/eth-sig-util/-/eth-sig-util-3.0.1.tgz"
+  "version" "3.0.1"
+  dependencies:
+    "ethereumjs-abi" "^0.6.8"
+    "ethereumjs-util" "^5.1.1"
+    "tweetnacl" "^1.0.3"
+    "tweetnacl-util" "^0.15.0"
+
 "ethereum-bloom-filters@^1.0.6":
   "integrity" "sha512-rxJ5OFN3RwjQxDcFP2Z5+Q9ho4eIdEmSc2ht0fCu8Se9nbXjZ7/031uXoUYJ87KHCOdVeiUuwSnoS7hmYAGVHA=="
   "resolved" "https://registry.npmjs.org/ethereum-bloom-filters/-/ethereum-bloom-filters-1.0.10.tgz"
@@ -3011,7 +3021,7 @@
     "ethereumjs-common" "^1.5.0"
     "ethereumjs-util" "^6.0.0"
 
-"ethereumjs-util@^5.2.0":
+"ethereumjs-util@^5.1.1", "ethereumjs-util@^5.2.0":
   "integrity" "sha512-v3kT+7zdyCm1HIqWlLNrHGqHGLpGYIhjeHxQjnDXjLT2FyGJDsd3LWMYUo7pAFRrk86CR3nUJfhC81CCoJNNGQ=="
   "resolved" "https://registry.npmjs.org/ethereumjs-util/-/ethereumjs-util-5.2.1.tgz"
   "version" "5.2.1"
@@ -6604,7 +6614,7 @@
   dependencies:
     "safe-buffer" "^5.0.1"
 
-"tweetnacl-util@^0.15.1":
+"tweetnacl-util@^0.15.0", "tweetnacl-util@^0.15.1":
   "integrity" "sha512-RKJBIj8lySrShN4w6i/BonWp2Z/uxwC3h4y7xsRrpP59ZboCd0GpEVsOnMDYLMmKBpYhb5TgHzZXy7wTfYFBRw=="
   "resolved" "https://registry.npmjs.org/tweetnacl-util/-/tweetnacl-util-0.15.1.tgz"
   "version" "0.15.1"

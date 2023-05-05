@@ -5,7 +5,7 @@ import Contract from '../../classes/Contract.mjs';
 dotenv.config();
 
 const master = await createClient(process.env.MASTER_PRIVATE_KEY);
-console.log(master.address);
+console.log('MASTER ADDRESS', master.address);
 
 const nftContract = await master.resolveContract('RentableNft', Contract);
 const forwarderContract = await master.resolveContract('MinimalForwarder', Contract);

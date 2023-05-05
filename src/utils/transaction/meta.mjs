@@ -1,3 +1,5 @@
+// import ethSigUtil from 'eth-sig-util';
+
 const EIP712Domain = [
     { name: 'name', type: 'string' },
     { name: 'version', type: 'string' },
@@ -42,22 +44,17 @@ const buildTypedData = async (forwarder, request) => {
     return { ...typeData, message: request };
 }
 
-const signTypedData = async (signer, from, data) => {
-    console.log(await signer.connection.signTypedData(from, data));
-    return new Promise((resolve, reject) => {
-        signer.send({method: 'eth_signTypedData', params: [from, data]}, (e, r) => {
-            if(e) {
-                reject(e);
-            }
-            resolve(r.result);
-        })
-    });
+const signTypedData = async (from, data, kit) => {    
+    const result = await kit.signTypedData(from, data);    
+    return `${result.r}${result.s.replace(/^0x/, '')}${result.v.toString(16)}`;
+    // const privateKey = Buffer.from(process.env.MASTER_PRIVATE_KEY.replace(/^0x/, ''), 'hex');
+    // return ethSigUtil.signTypedMessage(privateKey, { data });
   }
   
 
-export const signMetaTxRequest = async (signer, forwarder, input) => {    
+export const signMetaTxRequest = async (signer, forwarder, input, kit) => {    
     const request = await buildRequest(forwarder, input);   
-    const toSign = await buildTypedData(forwarder, request);   
-    const signature = await signTypedData(signer, input.from, toSign);   
+    const toSign = await buildTypedData(forwarder, request);       
+    const signature = await signTypedData(input.from, toSign, kit);   
     return { signature, request };
 }
