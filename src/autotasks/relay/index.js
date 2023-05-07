@@ -3,6 +3,7 @@ const { DefenderRelaySigner, DefenderRelayProvider } = require('defender-relay-c
 
 const ForwarderAbi = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"components":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"gas","type":"uint256"},{"internalType":"uint256","name":"nonce","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"internalType":"struct MinimalForwarder.ForwardRequest","name":"req","type":"tuple"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"execute","outputs":[{"internalType":"bool","name":"","type":"bool"},{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"payable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"}],"name":"getNonce","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"components":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"},{"internalType":"uint256","name":"gas","type":"uint256"},{"internalType":"uint256","name":"nonce","type":"uint256"},{"internalType":"bytes","name":"data","type":"bytes"}],"internalType":"struct MinimalForwarder.ForwardRequest","name":"req","type":"tuple"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"verify","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"}];
 const ForwarderAddress = '0x6932129121D8576Fbba1bDF8ffDF1311e605C595';
+const RentableAddress = '0xb8328ef8A85cE3D4421F0af9df017bB47BbB39aC';
 
 
 async function relay(forwarder, request, signature, whitelist) {
@@ -35,7 +36,7 @@ async function handler(event) {
   // Relay transaction!
   const tx = await relay(forwarder, request, signature);
   console.log(`Sent meta-tx: ${tx.hash}`);
-  return { txHash: tx.hash };
+  return tx;
 }
 
 module.exports = {

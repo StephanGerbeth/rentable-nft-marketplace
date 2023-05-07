@@ -44,7 +44,7 @@ async function handler(event) {
   // Relay transaction!
   const tx = await relay(forwarder, request, signature);
   console.log(`Sent meta-tx: ${tx.hash}`);
-  return { txHash: tx.hash };
+  return tx;
 }
 
 var relay_1 = {

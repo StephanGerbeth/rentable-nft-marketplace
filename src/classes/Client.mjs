@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import ContractKit from '@celo/contractkit';
-import { loadContract } from '../utils/json.mjs';
+import { createContract } from './Contract.mjs';
 
 export default class Client {
     constructor({kit}) {
@@ -19,11 +19,8 @@ export default class Client {
         return this.kit.web3.eth.net.getId();
     } 
 
-    async resolveContract(name, Clazz, customNetworkAddress) {
-        const {abi, networks} = await loadContract(name);           
-        const network = networks[await this.getNetworkId()];        
-        const contract = new this.kit.web3.eth.Contract(abi, customNetworkAddress || (network && network.address));
-        return new Clazz(this.kit, contract);
+    async getContract(name, customNetworkAddress) {
+        return createContract(this.kit, name, await this.getNetworkId(), customNetworkAddress);        
     }
 };
 

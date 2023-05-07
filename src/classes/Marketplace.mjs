@@ -65,10 +65,9 @@ export default class Marketplace {
                     from: this.kit.defaultAccount, 
                     value, 
                     // data: tx.encodeABI(),
-                    gas: await tx.estimateGas({from: this.kit.defaultAccount, value, gasPrice}),
-                    gasPrice
+                    gas: await tx.estimateGas({from: this.kit.defaultAccount, value, gasPrice})                    
                 };
-                return tx.send(options);
+                return tx.send({...options, gasPrice});
             })
         );
     }

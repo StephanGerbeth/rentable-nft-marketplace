@@ -1,23 +1,27 @@
 import dotenv from 'dotenv';
 import {createClient} from '../../classes/Client.mjs';
-import Contract from '../../classes/Contract.mjs';
+import { Relayer } from 'defender-relay-client';
 
 dotenv.config();
+
+const relayClient = new Relayer({ apiKey: process.env.DEFENDER_RELAYER_API_KEY, apiSecret: process.env.DEFENDER_RELAYER_SECRET_KEY });
+console.log(relayClient);
 
 const master = await createClient(process.env.MASTER_PRIVATE_KEY);
 console.log('MASTER ADDRESS', master.address);
 
-const nftContract = await master.resolveContract('RentableNft', Contract);
-const forwarderContract = await master.resolveContract('MinimalForwarder', Contract);
+const nftContract = await master.getContract('RentableNft');
+const forwarderContract = await master.getContract('MinimalForwarder');
 
-const request = await nftContract.mintNFT('ipfs://bafybeiffapvkruv2vwtomswqzxiaxdgm2dflet2cxmh6t4ixrgaezumbw4', forwarderContract)
-console.log(request);
+console.log(await master.getBalance());
 
-const result = await fetch(process.env.DEFENDER_WEBHOOK_URL, {
-    method: 'POST',
-    body: JSON.stringify(request),
-    headers: { 'Content-Type': 'application/json' },
-})
+const result = await nftContract.mintNFT('ipfs://bafybeiffapvkruv2vwtomswqzxiaxdgm2dflet2cxmh6t4ixrgaezumbw4', {forwarder: forwarderContract})
+console.log(result);
 
-console.log(await result.json());
+// setTimeout(async () => {
+//     const latestTx = await relayClient.query(result.transactionId);
+//     console.log(latestTx);
+// }, 12000)
+
+console.log(await master.getBalance());
 
