@@ -1,6 +1,8 @@
 // TUTORIAL: https://blog.openzeppelin.com/gasless-metatransactions-with-openzeppelin-defender/
 // SAMPLE REPO: https://github.com/OpenZeppelin/workshops/tree/9402515b42efe1b4b3c5d8621fc78b55e7078386/25-defender-metatx-api
 
+import { getTransferEventByHash } from "../events.mjs";
+
 // import ethSigUtil from 'eth-sig-util';
 
 const EIP712Domain = [
@@ -38,31 +40,33 @@ const buildTypedData = async (forwarder, request) => {
     return { ...typeData, message: request };
 }
 
-const signTypedData = async (signer, from, data) => {    
-    const result = await signer.signTypedData(from, data);    
+const signTypedData = async (contract, from, data) => {    
+    const result = await contract.kit.signTypedData(from, data);    
     return `${result.r}${result.s.replace(/^0x/, '')}${result.v.toString(16)}`;
     // const privateKey = Buffer.from(process.env.MASTER_PRIVATE_KEY.replace(/^0x/, ''), 'hex');
     // return ethSigUtil.signTypedMessage(privateKey, { data });
 } 
 
-const buildRequestBody = async (signer, forwarder, options) => {
+const buildRequestBody = async (contract, forwarder, options) => {
     const request = await buildRequest(forwarder, options);   
     const toSign = await buildTypedData(forwarder, request);       
-    const signature = await signTypedData(signer, options.from, toSign);  
+    const signature = await signTypedData(contract, options.from, toSign);  
 
     return { signature, request };
 }
 
-export const createMetaTx = (signer, forwarder) => { 
+export const createMetaTx = (contract, forwarder) => {     
     return {
-        async send(options) {
-            const requestBody = await buildRequestBody(signer, forwarder, options);
+        async send(options) {            
+            const requestBody = await buildRequestBody(contract, forwarder, options);            
             const response = await fetch(process.env.DEFENDER_WEBHOOK_URL, {
                 method: 'POST',
                 body: JSON.stringify(requestBody),
                 headers: { 'Content-Type': 'application/json' },
             });
-            return JSON.parse((await response.json()).result);                        
+            const json = await response.json();
+            const { hash } = JSON.parse(json.result)                
+            return getTransferEventByHash(contract, hash)                   
         }
     }       
 }
