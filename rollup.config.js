@@ -1,6 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
+import dotenv from "rollup-plugin-dotenv"
 import builtins from 'builtin-modules';
 
 export default {
@@ -13,7 +14,8 @@ export default {
   plugins: [
     resolve({ preferBuiltins: true }),
     commonjs(),
-    json({ compact: true }),
+    json({ compact: true, preferConst: true, namedExports: true }),
+    dotenv.default()
   ],
   external: [
     ...builtins,

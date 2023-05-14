@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/interfaces/IERC721.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "./IERC4907.sol";
 
-contract Marketplace is ReentrancyGuard, ERC2771Context {
+contract Marketplace is ERC2771Context, ReentrancyGuard {
   using Counters for Counters.Counter;
   using EnumerableSet for EnumerableSet.AddressSet;
   using EnumerableSet for EnumerableSet.UintSet;

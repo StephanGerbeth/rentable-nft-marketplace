@@ -1,9 +1,9 @@
 // TUTORIAL: https://blog.openzeppelin.com/gasless-metatransactions-with-openzeppelin-defender/
 // SAMPLE REPO: https://github.com/OpenZeppelin/workshops/tree/9402515b42efe1b4b3c5d8621fc78b55e7078386/25-defender-metatx-api
 
-import { getTransferEventByHash } from "../events.mjs";
+import { getEventByHash } from "../events.mjs";
 
-// import ethSigUtil from 'eth-sig-util';
+import ethSigUtil from 'eth-sig-util';
 
 const EIP712Domain = [
     { name: 'name', type: 'string' },
@@ -31,7 +31,7 @@ function getMetaTxTypeData(chainId, verifyingContract) {
 
 const buildRequest = async (forwarder, options) => {
     const nonce = (await forwarder.data.methods.getNonce(options.from).call()).toString();    
-    return { value: 0, nonce, ...options };
+    return { nonce, ...options };
   }
 
 const buildTypedData = async (forwarder, request) => {    
@@ -49,13 +49,14 @@ const signTypedData = async (contract, from, data) => {
 
 const buildRequestBody = async (contract, forwarder, options) => {
     const request = await buildRequest(forwarder, options);   
+    console.log('REQUEST', request);
     const toSign = await buildTypedData(forwarder, request);       
     const signature = await signTypedData(contract, options.from, toSign);  
 
     return { signature, request };
 }
 
-export const createMetaTx = (contract, forwarder) => {     
+export const createMetaTx = (contract, forwarder, eventName) => {     
     return {
         async send(options) {            
             const requestBody = await buildRequestBody(contract, forwarder, options);            
@@ -63,10 +64,11 @@ export const createMetaTx = (contract, forwarder) => {
                 method: 'POST',
                 body: JSON.stringify(requestBody),
                 headers: { 'Content-Type': 'application/json' },
-            });
-            const json = await response.json();
-            const { hash } = JSON.parse(json.result)                
-            return getTransferEventByHash(contract, hash)                   
+            });            
+            const json = await response.json();            
+            const { hash } = JSON.parse(json.result);
+            console.log(eventName, hash);                  
+            return getEventByHash(contract, eventName, hash)                   
         }
     }       
 }
